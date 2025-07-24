@@ -80,3 +80,71 @@ jobs:
               repo: context.repo.repo,
               body: '🎉 Your content has been published! You can view it at: https://memestageceo.github.io/docs-demo'
             })
+
+  pdf-export:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.1'
+          bundler-cache: true
+          cache-version: 0
+      
+      - name: Build Jekyll site
+        run: bundle exec jekyll build
+        env:
+          JEKYLL_ENV: production
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Install Puppeteer
+        run: npm install puppeteer
+      
+      - name: Generate PDF
+        run: |
+          node -e "
+          const puppeteer = require('puppeteer');
+          const fs = require('fs');
+          const path = require('path');
+          
+          (async () => {
+            const browser = await puppeteer.launch();
+            const page = await browser.newPage();
+            
+            // Read all markdown files and convert to PDF
+            const files = ['index.md', 'getting-started.md', 'data-management.md', 'web-maps.md'];
+            let htmlContent = '<html><head><style>body{font-family:Arial,sans-serif;line-height:1.6;margin:40px;}</style></head><body>';
+            
+            for (const file of files) {
+              if (fs.existsSync(file)) {
+                const content = fs.readFileSync(file, 'utf8');
+                htmlContent += '<div style=\"page-break-before: always;\"><h1>' + file + '</h1><pre>' + content + '</pre></div>';
+              }
+            }
+            htmlContent += '</body></html>';
+            
+            await page.setContent(htmlContent);
+            await page.pdf({
+              path: 'documentation.pdf',
+              format: 'A4',
+              printBackground: true,
+              margin: { top: '1in', right: '1in', bottom: '1in', left: '1in' }
+            });
+            
+            await browser.close();
+          })();
+          "
+      
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: documentation-pdf
+          path: documentation.pdf
