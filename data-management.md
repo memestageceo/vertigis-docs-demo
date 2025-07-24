@@ -10,12 +10,14 @@ Effective data management is crucial for successful GIS projects.
 ## Supported Data Formats
 
 ### Vector Data
+
 - **Shapefiles** (.shp) - Traditional GIS format
-- **File Geodatabase** (.gdb) - Esri's native format  
+- **File Geodatabase** (.gdb) - Esri's native format
 - **GeoJSON** - Web-friendly format
 - **KML/KMZ** - Google Earth format
 
 ### Raster Data
+
 - **GeoTIFF** - Tagged Image File Format with spatial reference
 - **IMG** - Erdas Imagine format
 - **MrSID** - Multi-resolution Seamless Image Database
@@ -23,6 +25,7 @@ Effective data management is crucial for successful GIS projects.
 ## Publishing Services
 
 ### Feature Services
+
 Feature services provide access to vector data with editing capabilities:
 
 ```
@@ -33,6 +36,7 @@ Feature services provide access to vector data with editing capabilities:
 ```
 
 ### Map Services
+
 Map services provide rendered map images for fast display.
 
 ## Best Practices
