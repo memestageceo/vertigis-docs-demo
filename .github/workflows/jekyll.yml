@@ -88,14 +88,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
+      - name: Install Pandoc
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc texlive-latex-base texlive-fonts-recommended texlive-latex-extra
+      
       - name: Generate PDFs from Markdown
-        uses: mkrakowitzer/actions-makepdfs@master
-        with:
-          markdown_dir: .
-          output_dir: tmp
+        run: |
+          mkdir -p pdfs
+          for file in *.md; do
+            if [ -f "$file" ]; then
+              pandoc "$file" -o "pdfs/${file%.md}.pdf" --pdf-engine=pdflatex
+            fi
+          done
       
       - name: Upload PDF artifact
         uses: actions/upload-artifact@v4
         with:
           name: platform-architecture-docs
-          path: tmp
+          path: pdfs
