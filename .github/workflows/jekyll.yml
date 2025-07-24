@@ -21,6 +21,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       
+      - name: Vale Linter
+        uses: errata-ai/vale-action@v2.1.0
+        with:
+          files: all
+          reporter: github-pr-annotations
+          fail_on_error: false
+          level: error
+          filter_mode: added
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
